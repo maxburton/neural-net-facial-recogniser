@@ -5,8 +5,8 @@
 * Create a new virtualenv, and ensure it is activated:
 ` venvname/Scripts/activate`
 * Install the following python packages using pip install:
-** tensorflow
-** keras
-** numpy
-** pandas
-** matplotlib
+    * tensorflow
+    * keras
+    * numpy
+    * pandas
+    * matplotlib
