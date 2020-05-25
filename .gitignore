@@ -1,6 +1,9 @@
 # Custom
 .idea/*
 venv/*
+model.json
+model.h5
+CNN.model/*
 
 # gitignore.io stuff:
 # Created by https://www.gitignore.io/api/python,pycharm

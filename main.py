@@ -1,25 +1,32 @@
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, Activation, Flatten, Conv2D, MaxPooling2D
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout, Activation, Flatten, Conv2D, MaxPooling2D
 import pickle
-from keras.models import model_from_json
-from keras.models import load_model
+from tensorflow.keras.models import model_from_json
+from tensorflow.keras.models import load_model
 import matplotlib.pyplot as plt
-from keras.datasets import mnist  # replace mnist with any dataset
+from tensorflow.keras.datasets import mnist  # replace mnist with any dataset
+import numpy as np
 
 # Load MNIST dataset
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
+# input shape must be (rows, cols, channels (i.e. 1 for grey, 3 for rgb)), i.e. doesn't include number of images, as
+# each are treated individually, so we reshape to include a single channel.
+# Number of images is used when fitting, however.
+x_train = x_train.reshape((x_train.shape[0], 28, 28, 1))
+x_test = x_test.reshape((x_test.shape[0], 28, 28, 1))
 
 # Opening the files about data
-X = pickle.load(open("X.pickle", "rb"))
-y = pickle.load(open("y.pickle", "rb"))
+# X = pickle.load(open("X.pickle", "rb"))
+# y = pickle.load(open("y.pickle", "rb"))
 
 # normalizing data (a pixel goes from 0 to 255)
-X = X / 255.0
+x_train = x_train / 255.0
+x_test = x_test / 255.0
 
 # Building the model
 model = Sequential()
 # 3 convolutional layers
-model.add(Conv2D(32, (3, 3), input_shape=X.shape[1:]))
+model.add(Conv2D(32, (3, 3), input_shape=x_train.shape[1:]))
 model.add(Activation("relu"))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
@@ -51,7 +58,7 @@ model.compile(loss="sparse_categorical_crossentropy",
 
 # Training the model, with 40 iterations
 # validation_split corresponds to the percentage of images used for the validation phase compared to all the images
-history = model.fit(X, y, batch_size=32, epochs=40, validation_split=0.1)
+history = model.fit(x_train, y_train, batch_size=32, epochs=40, verbose=1, validation_data=(x_test, y_test))
 
 # Saving the model
 model_json = model.to_json()
@@ -66,9 +73,10 @@ model.save('CNN.model')
 # Printing a graph showing the accuracy changes during the training phase
 print(history.history.keys())
 plt.figure(1)
-plt.plot(history.history['acc'])
-plt.plot(history.history['val_acc'])
+plt.plot(history.history['accuracy'])
+plt.plot(history.history['val_accuracy'])
 plt.title('model accuracy')
 plt.ylabel('accuracy')
 plt.xlabel('epoch')
 plt.legend(['train', 'validation'], loc='upper left')
+plt.show()
